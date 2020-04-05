@@ -1,33 +1,27 @@
 import sys
-sys.path.append('/Python_files')
-import Encoder_v2
-import CoattentionEncoder_v2
-import Dynamic_Pointing_Decoder
-import Config_file
-
-
-
+import Python_files.Encoder_v2 as Encoder_v2
+import Python_files.CoattentionEncoder_v2 as CoattentionEncoder_v2
+import Python_files.Dynamic_Pointing_Decoder as Dynamic_Pointing_Decoder
+import Python_files.Config_file as Config_file
+import os 
+from pathlib import Path
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.cuda
-from copy import copy
-from torch.nn.utils.rnn import pad_sequence
 import numpy as np
 import pandas as pd
 import csv as csv
 import torch.optim as optimizer
-import math 
+
 import random 
-from torch.nn.utils.rnn import pack_padded_sequence
-from torch.nn.utils.rnn import pad_packed_sequence
 import time
-import sys
 import pickle
 from statistics import mean
 sys.path.append('')
 
 
+save = False
+cwd = os.getcwd()
 
 #check if cuda is available
 #if it is available, set the default tensor to cuda 
@@ -38,7 +32,7 @@ else:
   torch.set_default_tensor_type(torch.FloatTensor)
 #torch.randn((1,2)).long().is_cuda
 
-with open('../data/glove_words_used_pd.txt', 'r') as glove:
+with open( os.path.dirname(cwd)+'/glove_words_used_pd.txt' , 'r') as glove:
   glove_data_file = glove
   words = pd.read_table(glove_data_file, sep=",", index_col=0, header=None, quoting=csv.QUOTE_ALL)
   
@@ -105,7 +99,7 @@ saveEveryXEpochs = 50
 epoch_left_off = 0
 epoch_losses = []
 
-number_to_train = 24000 
+number_to_train = 32
 start_from = 0
 
 experimenter = "Fleur" #Change this to your name when you run an experiment
@@ -141,21 +135,21 @@ model.train() #Make sure it's in training mode
 
 from tqdm import tqdm
 
-with open('../data/train.span', 'r') as span:
+with open(cwd +'/data/train.span', 'r') as span:
   allspans = span.readlines()
 
 spans = allspans[start_from:start_from+number_to_train]
 print(hyperparameters)
 
-with open('../data/Saved_Files_Test/traincontexts_lengths_1to5', 'rb') as traincontexts_lengths_file:
+with open(cwd + '/data/Saved_Files_Test/traincontexts_lengths_1to5', 'rb') as traincontexts_lengths_file:
     contexts_lengths = pickle.load(traincontexts_lengths_file)[start_from:start_from+number_to_train]
 
-with open('../data/Saved_Files_Test/trainquestions_lengths_1to5', 'rb') as trainquestions_lengths_file:
+with open(cwd +'/data/Saved_Files_Test/trainquestions_lengths_1to5', 'rb') as trainquestions_lengths_file:
     questions_lengths = pickle.load(trainquestions_lengths_file)[start_from:start_from+number_to_train]
                                                                       
-with open('../data/Saved_Files_Test/traincontexts_indices_1to5', 'rb') as traincontexts_indices_file:
+with open(cwd +'/data/Saved_Files_Test/traincontexts_indices_1to5', 'rb') as traincontexts_indices_file:
     contexts_indices = pickle.load(traincontexts_indices_file)[start_from:start_from+number_to_train]
-with open('../data/Saved_Files_Test/trainquestions_indices_1to5', 'rb') as trainquestions_indices_file:
+with open(cwd +'/data/Saved_Files_Test/trainquestions_indices_1to5', 'rb') as trainquestions_indices_file:
     questions_indices = pickle.load(trainquestions_indices_file)[start_from:start_from+number_to_train]
 
 batch_losses = []
@@ -164,8 +158,8 @@ epoch_loss = 0 if len(epoch_losses)==0 else epoch_losses[-1]
 for epoch in range(epoch_left_off, Config_file.epochs): 
   print("starting epoch: " + str(epoch+1) + " of: " + str(Config_file.epochs))
   
-  if epoch%saveEveryXEpochs==0:
-    FILE_PATH = "../Models/" + experimenter+experiment + "epochs" +str(epoch)+"sizedata"+str(number_to_train)
+  if save and epoch%saveEveryXEpochs==0:
+    FILE_PATH = cwd + "/Models/" + experimenter+experiment + "epochs" +str(epoch)+"sizedata"+str(number_to_train)
     torch.save({
               'epoch': epoch,
               'model_state_dict': model.state_dict(),
@@ -175,8 +169,8 @@ for epoch in range(epoch_left_off, Config_file.epochs):
               'hyperparameters': hyperparameters
               }, FILE_PATH)
     
-  if epoch%5==0:
-    FILE_PATH = "../Models/" + experimenter+experiment+"sizedata"+str(number_to_train)
+  if save and epoch%5==0:
+    FILE_PATH = cwd + "/Models/" + experimenter+experiment+"sizedata"+str(number_to_train)
     torch.save({
               'epoch': epoch,
               'model_state_dict': model.state_dict(),
@@ -260,7 +254,7 @@ for epoch in range(epoch_left_off, Config_file.epochs):
   print("Mean epoch loss ", epoch_loss)
   batch_losses = []
 
-FILE_PATH = "../Models/" + experimenter + experiment + "epochs" +str(epoch)+"sizedata"+str(number_to_train) + "End"
+FILE_PATH = cwd + "/Models/" + experimenter + experiment + "epochs" +str(epoch)+"sizedata"+str(number_to_train) + "End"
 torch.save({
           'epoch': epoch,
           'model_state_dict': model.state_dict(),
