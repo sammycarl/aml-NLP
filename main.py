@@ -1,5 +1,5 @@
 import sys
-sys.path.append('/content/drive/My Drive/Oxford/Advanced Machine Learning/Python_files')
+sys.path.append('/Python_files')
 import Encoder_v2
 import CoattentionEncoder_v2
 import Dynamic_Pointing_Decoder
@@ -25,7 +25,7 @@ import time
 import sys
 import pickle
 from statistics import mean
-sys.path.append('/content/drive/My Drive/Oxford/Advanced Machine Learning/')
+sys.path.append('')
 
 
 
@@ -38,7 +38,7 @@ else:
   torch.set_default_tensor_type(torch.FloatTensor)
 #torch.randn((1,2)).long().is_cuda
 
-with open('/content/drive/My Drive/Oxford/Advanced Machine Learning/data/glove_words_used_pd.txt', 'r') as glove:
+with open('../data/glove_words_used_pd.txt', 'r') as glove:
   glove_data_file = glove
   words = pd.read_table(glove_data_file, sep=",", index_col=0, header=None, quoting=csv.QUOTE_ALL)
   
@@ -141,21 +141,21 @@ model.train() #Make sure it's in training mode
 
 from tqdm import tqdm
 
-with open('/content/drive/My Drive/Oxford/Advanced Machine Learning/data/train.span', 'r') as span:
+with open('../data/train.span', 'r') as span:
   allspans = span.readlines()
 
 spans = allspans[start_from:start_from+number_to_train]
 print(hyperparameters)
 
-with open('/content/drive/My Drive/Oxford/Advanced Machine Learning/data/Saved_Files_Test/traincontexts_lengths_1to5', 'rb') as traincontexts_lengths_file:
+with open('../data/Saved_Files_Test/traincontexts_lengths_1to5', 'rb') as traincontexts_lengths_file:
     contexts_lengths = pickle.load(traincontexts_lengths_file)[start_from:start_from+number_to_train]
 
-with open('/content/drive/My Drive/Oxford/Advanced Machine Learning/data/Saved_Files_Test/trainquestions_lengths_1to5', 'rb') as trainquestions_lengths_file:
+with open('../data/Saved_Files_Test/trainquestions_lengths_1to5', 'rb') as trainquestions_lengths_file:
     questions_lengths = pickle.load(trainquestions_lengths_file)[start_from:start_from+number_to_train]
                                                                       
-with open('/content/drive/My Drive/Oxford/Advanced Machine Learning/data/Saved_Files_Test/traincontexts_indices_1to5', 'rb') as traincontexts_indices_file:
+with open('../data/Saved_Files_Test/traincontexts_indices_1to5', 'rb') as traincontexts_indices_file:
     contexts_indices = pickle.load(traincontexts_indices_file)[start_from:start_from+number_to_train]
-with open('/content/drive/My Drive/Oxford/Advanced Machine Learning/data/Saved_Files_Test/trainquestions_indices_1to5', 'rb') as trainquestions_indices_file:
+with open('../data/Saved_Files_Test/trainquestions_indices_1to5', 'rb') as trainquestions_indices_file:
     questions_indices = pickle.load(trainquestions_indices_file)[start_from:start_from+number_to_train]
 
 batch_losses = []
@@ -165,7 +165,7 @@ for epoch in range(epoch_left_off, Config_file.epochs):
   print("starting epoch: " + str(epoch+1) + " of: " + str(Config_file.epochs))
   
   if epoch%saveEveryXEpochs==0:
-    FILE_PATH = "/content/drive/My Drive/Oxford/Advanced Machine Learning/Models/" + experimenter+experiment + "epochs" +str(epoch)+"sizedata"+str(number_to_train)
+    FILE_PATH = "../Models/" + experimenter+experiment + "epochs" +str(epoch)+"sizedata"+str(number_to_train)
     torch.save({
               'epoch': epoch,
               'model_state_dict': model.state_dict(),
@@ -176,7 +176,7 @@ for epoch in range(epoch_left_off, Config_file.epochs):
               }, FILE_PATH)
     
   if epoch%5==0:
-    FILE_PATH = "/content/drive/My Drive/Oxford/Advanced Machine Learning/Models/" + experimenter+experiment+"sizedata"+str(number_to_train)
+    FILE_PATH = "../Models/" + experimenter+experiment+"sizedata"+str(number_to_train)
     torch.save({
               'epoch': epoch,
               'model_state_dict': model.state_dict(),
@@ -260,7 +260,7 @@ for epoch in range(epoch_left_off, Config_file.epochs):
   print("Mean epoch loss ", epoch_loss)
   batch_losses = []
 
-FILE_PATH = "/content/drive/My Drive/Oxford/Advanced Machine Learning/Models/" + experimenter + experiment + "epochs" +str(epoch)+"sizedata"+str(number_to_train) + "End"
+FILE_PATH = "../Models/" + experimenter + experiment + "epochs" +str(epoch)+"sizedata"+str(number_to_train) + "End"
 torch.save({
           'epoch': epoch,
           'model_state_dict': model.state_dict(),
